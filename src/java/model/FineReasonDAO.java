@@ -16,6 +16,7 @@ import utils.DBUtils;
  * @author Admin
  */
 public class FineReasonDAO {
+    
     public List<FineReasonDTO> getAllReasons() throws Exception {
         String sql = "SELECT ReasonCode, DisplayName, Description FROM FineReasons ORDER BY DisplayName";
         List<FineReasonDTO> list = new ArrayList<>();

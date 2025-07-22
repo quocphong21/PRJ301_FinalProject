@@ -92,45 +92,45 @@ public class BorrowDAO {
     }
     
     public List<BorrowDTO> searchBorrowsByUserAndDate(int userId, String fromDate, String toDate) {
-    List<BorrowDTO> list = new ArrayList<>();
-    String sql = GetBorrow + "WHERE b.UserID = ?";
-    if (fromDate != null && !fromDate.isEmpty()) {
-        sql += " AND b.BorrowDate >= ?";
-    }
-    if (toDate != null && !toDate.isEmpty()) {
-        sql += " AND b.BorrowDate <= ?";
-    }
-    sql += " ORDER BY b.BorrowDate DESC";
-
-    try {
-        con = DBUtils.getConnection();
-        pst = con.prepareStatement(sql);
-
-        int index = 1;
-        pst.setInt(index++, userId);
+        List<BorrowDTO> list = new ArrayList<>();
+        String sql = GetBorrow + "WHERE b.UserID = ?";
         if (fromDate != null && !fromDate.isEmpty()) {
-            pst.setDate(index++, Date.valueOf(fromDate));
+            sql += " AND b.BorrowDate >= ?";
         }
         if (toDate != null && !toDate.isEmpty()) {
-            pst.setDate(index++, Date.valueOf(toDate));
+            sql += " AND b.BorrowDate <= ?";
         }
+        sql += " ORDER BY b.BorrowDate DESC";
 
-        rs = pst.executeQuery();
-        while (rs.next()) {
-            int borrowId = rs.getInt("BorrowID");
-            String fullName = rs.getString("FullName");
-            Date borrowDate = rs.getDate("BorrowDate");
-            Date returnDate = rs.getDate("ReturnDate");
-            String status = rs.getString("Status");
-            Date expectedReturnDate = rs.getDate("ExpectedReturnDate");
-            list.add(new BorrowDTO(borrowId, userId, fullName, borrowDate, expectedReturnDate, returnDate, status));
+        try {
+            con = DBUtils.getConnection();
+            pst = con.prepareStatement(sql);
 
+            int index = 1;
+            pst.setInt(index++, userId);
+            if (fromDate != null && !fromDate.isEmpty()) {
+                pst.setDate(index++, Date.valueOf(fromDate));
+            }
+            if (toDate != null && !toDate.isEmpty()) {
+                pst.setDate(index++, Date.valueOf(toDate));
+            }
+
+            rs = pst.executeQuery();
+            while (rs.next()) {
+                int borrowId = rs.getInt("BorrowID");
+                String fullName = rs.getString("FullName");
+                Date borrowDate = rs.getDate("BorrowDate");
+                Date returnDate = rs.getDate("ReturnDate");
+                String status = rs.getString("Status");
+                Date expectedReturnDate = rs.getDate("ExpectedReturnDate");
+                list.add(new BorrowDTO(borrowId, userId, fullName, borrowDate, expectedReturnDate, returnDate, status));
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-    } catch (Exception e) {
-        e.printStackTrace();
+        return list;
     }
-    return list;
-}
 
 
     public List<BorrowDTO> getBorrowsByUser(int userId_input) {
@@ -236,43 +236,41 @@ public class BorrowDAO {
     }
     
     public void updateStatus(int borrowId, String newStatus) {
-    try (Connection con = DBUtils.getConnection();
-        PreparedStatement ps = con.prepareStatement(UpdateStatus)) {
+        try (Connection con = DBUtils.getConnection();
+            PreparedStatement ps = con.prepareStatement(UpdateStatus)) {
 
-        ps.setString(1, newStatus);
-        ps.setInt(2, borrowId);
-        ps.executeUpdate();
-    } catch (Exception e) {
-        e.printStackTrace();
-    }
-}
-    //phong them
-    public BorrowDTO getBorrowById(int borrowId) throws Exception {
-    String sql = "SELECT b.BorrowID, b.UserID, u.FullName, b.BorrowDate, b.ExpectedReturnDate, " +
-                 "b.ReturnDate, b.Status " +
-                 "FROM Borrows b JOIN Users u ON b.UserID = u.UserID " +
-                 "WHERE b.BorrowID = ?";
-
-    try (Connection con = DBUtils.getConnection();
-         PreparedStatement pst = con.prepareStatement(sql)) {
-
-        pst.setInt(1, borrowId);
-        try (ResultSet rs = pst.executeQuery()) {
-            if (rs.next()) {
-                BorrowDTO dto = new BorrowDTO();
-                dto.setBorrowId(rs.getInt("BorrowID"));
-                dto.setUserId(rs.getInt("UserID"));
-                dto.setFullName(rs.getString("FullName"));
-                dto.setBorrowDate(rs.getDate("BorrowDate"));
-                dto.setExpectedReturnDate(rs.getDate("ExpectedReturnDate"));
-                dto.setReturnDate(rs.getDate("ReturnDate"));
-                dto.setStatus(rs.getString("Status"));  // ✅ sử dụng đúng tên cột
-                return dto;
-            }
+            ps.setString(1, newStatus);
+            ps.setInt(2, borrowId);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
-    return null;
-}
+    //phong them
+    public BorrowDTO getBorrowById(int borrowId) throws Exception {
+        String sql = "SELECT b.BorrowID, b.UserID, u.FullName, b.BorrowDate, b.ExpectedReturnDate, " +
+                     "b.ReturnDate, b.Status " +
+                     "FROM Borrows b JOIN Users u ON b.UserID = u.UserID " +
+                     "WHERE b.BorrowID = ?";
 
+        try (Connection con = DBUtils.getConnection();
+             PreparedStatement pst = con.prepareStatement(sql)) {
 
+            pst.setInt(1, borrowId);
+            try (ResultSet rs = pst.executeQuery()) {
+                if (rs.next()) {
+                    BorrowDTO dto = new BorrowDTO();
+                    dto.setBorrowId(rs.getInt("BorrowID"));
+                    dto.setUserId(rs.getInt("UserID"));
+                    dto.setFullName(rs.getString("FullName"));
+                    dto.setBorrowDate(rs.getDate("BorrowDate"));
+                    dto.setExpectedReturnDate(rs.getDate("ExpectedReturnDate"));
+                    dto.setReturnDate(rs.getDate("ReturnDate"));
+                    dto.setStatus(rs.getString("Status"));  // ✅ sử dụng đúng tên cột
+                    return dto;
+                }
+            }
+        }
+        return null;
+    }
 }

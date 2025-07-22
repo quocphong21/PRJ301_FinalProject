@@ -25,13 +25,13 @@ public class ReservationDAO {
     private ResultSet rs = null;
     
     public void autoExpireAllReadyToPickupReservations() {
-    while (true) {
-        autoExpireReadyToPickupReservations();
-        if (!hasMoreReadyToExpire()) {
-            break;
+        while (true) {
+            autoExpireReadyToPickupReservations();
+            if (!hasMoreReadyToExpire()) {
+                break;
+            }
         }
     }
-}
 
 
     public void autoExpireReadyToPickupReservations() {

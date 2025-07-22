@@ -367,7 +367,7 @@ public class BorrowController extends HttpServlet {
 
                 if (lostQty > 0 && lostQty <= item.getQuantity()) {
                     // 🔻 Trừ tồn kho
-                    bdao.updateBookAvailable(item.getBookId(), -lostQty);
+                    bdao.decreaseBookQuantity(item.getBookId(), -lostQty);
 
                     // 🔻 Thêm vào bảng LostBooks
                     boolean lostInserted = lostDAO.insertLostBook(borrowId, item.getBookId(), lostQty);

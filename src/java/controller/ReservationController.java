@@ -92,6 +92,7 @@ public class ReservationController extends HttpServlet {
 
             request.getRequestDispatcher(url).forward(request, response);
     }
+    
     private String handleViewReservations(HttpServletRequest request) {
         if (!GeneralMethod.isMember(request)) {
             GeneralMethod.getAccessDenied(request, "You do not have permission to do this feature");
@@ -266,46 +267,45 @@ public class ReservationController extends HttpServlet {
 
 
     private String handleViewReservationDetail(HttpServletRequest request) {
-    if (!GeneralMethod.isLoggedIn(request)) {
-        GeneralMethod.getAccessDenied(request, "You do not have permission to do this feature");
-        return WELCOME;
-    }
+        if (!GeneralMethod.isLoggedIn(request)) {
+            GeneralMethod.getAccessDenied(request, "You do not have permission to do this feature");
+            return WELCOME;
+        }
 
-    String ridStr = request.getParameter("reservationID");
-    if (ridStr == null) {
-        request.setAttribute("message", "Missing reservation ID.");
-        return "reservationHistory.jsp";
-    }
-
-    try {
-        int reservationID = Integer.parseInt(ridStr);
-
-        // Update reservation status before showing detail
-        reservationDAO.autoExpireAllReadyToPickupReservations(); // ✅ Expire outdated
-        reservationDAO.updateReservationsToReady();              // ✅ Promote eligible
-
-        ReservationDTO reservation = reservationDAO.getReservationById(reservationID);
-        if (reservation == null) {
-            request.setAttribute("message", "Reservation not found.");
+        String ridStr = request.getParameter("reservationID");
+        if (ridStr == null) {
+            request.setAttribute("message", "Missing reservation ID.");
             return "reservationHistory.jsp";
         }
 
-        // ✅ Get status description
-        ReservationStatusDAO statusDAO = new ReservationStatusDAO();
-        ReservationStatusDTO statusDTO = statusDAO.getStatusByCode(reservation.getStatusCode());
-        if (statusDTO != null) {
-            request.setAttribute("statusDescription", statusDTO.getDescription());
+        try {
+            int reservationID = Integer.parseInt(ridStr);
+
+            // Update reservation status before showing detail
+            reservationDAO.autoExpireAllReadyToPickupReservations(); // ✅ Expire outdated
+            reservationDAO.updateReservationsToReady();              // ✅ Promote eligible
+
+            ReservationDTO reservation = reservationDAO.getReservationById(reservationID);
+            if (reservation == null) {
+                request.setAttribute("message", "Reservation not found.");
+                return "reservationHistory.jsp";
+            }
+
+            // ✅ Get status description
+            ReservationStatusDAO statusDAO = new ReservationStatusDAO();
+            ReservationStatusDTO statusDTO = statusDAO.getStatusByCode(reservation.getStatusCode());
+            if (statusDTO != null) {
+                request.setAttribute("statusDescription", statusDTO.getDescription());
+            }
+
+            request.setAttribute("reservation", reservation);
+            return "reservationDetail.jsp";
+
+        } catch (NumberFormatException e) {
+            request.setAttribute("message", "Invalid reservation ID.");
+            return "reservationHistory.jsp";
         }
-
-        request.setAttribute("reservation", reservation);
-        return "reservationDetail.jsp";
-
-    } catch (NumberFormatException e) {
-        request.setAttribute("message", "Invalid reservation ID.");
-        return "reservationHistory.jsp";
     }
-}
-
 
     private String handleCancelReservation(HttpServletRequest request) {
         String ridStr = request.getParameter("reservationID");

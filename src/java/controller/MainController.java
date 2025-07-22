@@ -130,6 +130,7 @@ public class MainController extends HttpServlet {
         }
         return false;
     }
+    
     private boolean isBorrowAction(String action) {
         List<String> listBorrowAction = new ArrayList<>();
         listBorrowAction.add("viewAllBorrows");
@@ -164,15 +165,16 @@ public class MainController extends HttpServlet {
         list.add("searchReservationsForAdmin");
         return list.contains(action);
     }
-private boolean isFineAction(String action) {
-    List<String> listFineAction = new ArrayList<>();
-    listFineAction.add("listFine");
-    listFineAction.add("createForm");
-    listFineAction.add("createFine");
-    listFineAction.add("updateStatus");
-    listFineAction.add("searchFine");
-    return listFineAction.contains(action);
-}
+    
+    private boolean isFineAction(String action) {
+        List<String> listFineAction = new ArrayList<>();
+        listFineAction.add("listFine");
+        listFineAction.add("createForm");
+        listFineAction.add("createFine");
+        listFineAction.add("updateStatus");
+        listFineAction.add("searchFine");
+        return listFineAction.contains(action);
+    }
 
 
 }
