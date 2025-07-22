@@ -160,24 +160,24 @@ public class FineDAO {
                      "JOIN FineReasons fr ON f.Reason = fr.ReasonCode " +
                      "JOIN Borrows b ON f.BorrowID = b.BorrowID " +
                      "JOIN Users u ON b.UserID = u.UserID " +
-                     "WHERE (f.Reason LIKE ? OR ? = '') " +
-                     "AND (f.StatusCode LIKE ? OR ? = '') " +
-                     "AND (u.FullName LIKE ? OR ? = '')";
+                     "WHERE (? = '' OR f.Reason LIKE ?) " +
+                     "AND (? = '' OR f.StatusCode = ?) " +
+                     "AND (? = '' OR u.FullName LIKE ?)";
 
         List<FineDTO> list = new ArrayList<>();
         try (Connection con = DBUtils.getConnection();
              PreparedStatement pst = con.prepareStatement(sql)) {
 
-            String reasonWildcard = "%" + (reason == null ? "" : reason.trim()) + "%";
-            String statusWildcard = "%" + (status == null ? "" : status.trim()) + "%";
-            String nameWildcard = "%" + (name == null ? "" : name.trim()) + "%";
+            String reasonVal = reason == null ? "" : reason.trim();
+            String statusVal = status == null ? "" : status.trim();
+            String nameVal = name == null ? "" : name.trim();
 
-            pst.setString(1, reasonWildcard);
-            pst.setString(2, reason == null ? "" : reason.trim());
-            pst.setString(3, statusWildcard);
-            pst.setString(4, status == null ? "" : status.trim());
-            pst.setString(5, nameWildcard);
-            pst.setString(6, name == null ? "" : name.trim());
+            pst.setString(1, reasonVal);
+            pst.setString(2, "%" + reasonVal + "%");
+            pst.setString(3, statusVal);
+            pst.setString(4, statusVal);
+            pst.setString(5, nameVal);
+            pst.setString(6, "%" + nameVal + "%");
 
             try (ResultSet rs = pst.executeQuery()) {
                 while (rs.next()) {
@@ -199,6 +199,7 @@ public class FineDAO {
         }
         return list;
     }
+
     public List<FineDTO> searchFinesByUserID(int userId, String reason, String status) throws Exception {
         String sql = "SELECT f.FineID, f.BorrowID, f.Amount, f.CreatedAt, f.StatusCode, f.Reason, " +
                      "fs.DisplayName AS StatusDisplayName, fs.Description AS StatusDescription, " +
