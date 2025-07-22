@@ -46,7 +46,14 @@
                         <option value="Waived" ${param.status == 'Waived' ? 'selected' : ''}>Waived</option>
                     </select>
                 </div>
-
+                <c:if test="${sessionScope.user.role eq 'admin'}">
+                    <div class="col-md-3">
+                        <label class="form-label">Borrower Name</label>
+                        <input type="text" name="name" class="form-control" placeholder="Enter borrower name"
+                               value="${param.name != null ? param.name : ''}" />
+                    </div>
+                </c:if>
+    
                 <div class="col-md-3 d-flex align-items-end">
                     <button type="submit" class="btn btn-primary w-100">Search</button>
                 </div>

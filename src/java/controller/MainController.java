@@ -170,6 +170,7 @@ private boolean isFineAction(String action) {
     listFineAction.add("createForm");
     listFineAction.add("createFine");
     listFineAction.add("updateStatus");
+    listFineAction.add("searchFine");
     return listFineAction.contains(action);
 }
 
